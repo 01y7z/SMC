@@ -47,6 +47,7 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+.vitest/
 
 test-results/
 playwright-report/
