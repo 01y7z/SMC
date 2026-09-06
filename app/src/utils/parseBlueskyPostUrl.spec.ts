@@ -5,7 +5,10 @@ describe('parseBlueskyPostUrl', () => {
   it('accepts a valid Bluesky post URL', () => {
     const result = parseBlueskyPostUrl('https://bsky.app/profile/bsky.app/post/3l6oveex3ii2l')
 
-    expect(result).not.toBeNull()
+    expect(result).toEqual({
+      profileIdentifier: 'bsky.app',
+      recordKey: '3l6oveex3ii2l',
+    })
   })
 
   it('rejects a malformed URL', () => {

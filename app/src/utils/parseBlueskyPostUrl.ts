@@ -1,4 +1,9 @@
-export function parseBlueskyPostUrl(input: string): URL | null {
+type BlueskyPostReference = {
+  profileIdentifier: string
+  recordKey: string
+}
+
+export function parseBlueskyPostUrl(input: string): BlueskyPostReference | null {
   try {
     const parsedUrl = new URL(input)
     const splitUrl = parsedUrl.pathname.split('/')
@@ -20,7 +25,12 @@ export function parseBlueskyPostUrl(input: string): URL | null {
     }
 
     const filteredUrl = splitUrl.filter((segment) => segment.length > 0)
+    const profileIdentifier = filteredUrl[1]
+    const recordKey = filteredUrl[3]
 
+    if (!profileIdentifier || !recordKey) {
+      return null
+    }
     if (filteredUrl.length !== 4) {
       return null
     }
@@ -29,7 +39,12 @@ export function parseBlueskyPostUrl(input: string): URL | null {
       return null
     }
 
-    return parsedUrl
+    const reference: BlueskyPostReference = {
+      profileIdentifier,
+      recordKey,
+    }
+
+    return reference
   } catch {
     return null
   }
