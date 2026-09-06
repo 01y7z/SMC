@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { parseBlueskyPostUrl } from './utils/parseBlueskyPostUrl'
 
 const postUrl = ref('')
+const validationError = ref('')
 
 function handleSubmit() {
-  console.log(postUrl.value)
+  const parsedResult = parseBlueskyPostUrl(postUrl.value)
+
+  if (parsedResult === null) {
+    validationError.value = 'Enter a valid Bluesky post URL'
+    return
+  }
+
+  validationError.value = ''
+  console.log(parsedResult)
 }
 </script>
 
@@ -15,7 +25,8 @@ function handleSubmit() {
         <h1>SMC</h1>
       </header>
 
-      <form @submit.prevent="handleSubmit">
+      <form novalidate @submit.prevent="handleSubmit">
+        <p role="alert">{{ validationError }}</p>
         <label for="post-url">Input your Bluesky post link here.</label>
         <input
           id="post-url"
