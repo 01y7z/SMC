@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { parseBlueskyPostUrl } from './utils/parseBlueskyPostUrl'
+import { fetchBlueskyPost } from './services/fetchBlueskyPost'
 
 const postUrl = ref('')
 const validationError = ref('')
+const retrievedPost = ref<unknown | null>(null)
 
-function handleSubmit() {
+async function handleSubmit() {
+  retrievedPost.value = null
   const parsedResult = parseBlueskyPostUrl(postUrl.value)
 
   if (parsedResult === null) {
@@ -14,7 +17,11 @@ function handleSubmit() {
   }
 
   validationError.value = ''
-  console.log(parsedResult)
+  try {
+    retrievedPost.value = await fetchBlueskyPost(parsedResult)
+  } catch {
+    validationError.value = 'Could not retrieve this Bluesky post'
+  }
 }
 </script>
 
