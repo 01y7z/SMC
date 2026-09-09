@@ -1,4 +1,4 @@
-type BlueskyPostReference = {
+export type BlueskyPostReference = {
   profileIdentifier: string
   recordKey: string
 }
