@@ -75,14 +75,24 @@ describe('App', () => {
     expect(wrapper.get('[role="alert"]').text()).toBe('Could not retrieve this Bluesky post')
   })
 
-  // image post should show images after being fetched
-  it('shows the detected type for an image post', async () => {
+  // image post should show its detected type and first image
+  it('shows the detected type and first image for an image post', async () => {
     const apiData = {
       posts: [
         {
           embed: {
             $type: 'app.bsky.embed.images#view',
-            images: [],
+            images: [
+              {
+                thumb: 'https://cdn.bsky.app/thumb.jpg',
+                fullsize: 'https://cdn.bsky.app/fullsize.jpg',
+                alt: 'Example image',
+                aspectRatio: {
+                  width: 1200,
+                  height: 800,
+                },
+              },
+            ],
           },
         },
       ],
@@ -102,5 +112,7 @@ describe('App', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('Detected post type: images')
+    expect(wrapper.get('img').attributes('src')).toBe('https://cdn.bsky.app/fullsize.jpg')
+    expect(wrapper.get('img').attributes('alt')).toBe('Example image')
   })
 })
