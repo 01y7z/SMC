@@ -39,6 +39,40 @@ export function classifyBlueskyPost(post: unknown): BlueskyPostKind {
     return 'video'
   }
 
+  // embed == video gif or external gif provider
+  if (embed.$type === 'app.bsky.embed.external#view') {
+    if (!('external' in embed) || typeof embed.external !== 'object' || embed.external === null) {
+      return 'unsupported'
+    }
+
+    const external = embed.external
+
+    if (!('uri' in external) || typeof external.uri !== 'string') {
+      return 'unsupported'
+    }
+
+    // convert uri into url for decoding
+    let requestUrl: URL
+    try {
+      requestUrl = new URL(external.uri)
+    } catch {
+      return 'unsupported'
+    }
+
+    // check that the protocol, hostname, port, and pathnames all match klipy and .gif format
+    if (
+      requestUrl.protocol !== 'https:' ||
+      requestUrl.hostname !== 'static.klipy.com' ||
+      requestUrl.port !== '' ||
+      !requestUrl.pathname.toLowerCase().endsWith('.gif')
+    ) {
+      return 'unsupported'
+    }
+
+    // all checks passed
+    return 'gif'
+  }
+
   // if it doesnt pass any checks, return unsupported
   return 'unsupported'
 }

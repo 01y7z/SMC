@@ -38,6 +38,20 @@ describe('classifyBlueskyPost', () => {
     expect(classifyBlueskyPost(post)).toBe('gif')
   })
 
+  // klipy external gif should be gif
+  it('classifies a Klipy external GIF as gif', () => {
+    const post = {
+      embed: {
+        $type: 'app.bsky.embed.external#view',
+        external: {
+          uri: 'https://static.klipy.com/example.gif?hh=281&ww=498',
+        },
+      },
+    }
+
+    expect(classifyBlueskyPost(post)).toBe('gif')
+  })
+
   // video with default presentation should be video
   it('classifies a default video embed as video', () => {
     const post = {
@@ -55,11 +69,39 @@ describe('classifyBlueskyPost', () => {
     expect(classifyBlueskyPost(null)).toBe('unsupported')
   })
 
-  // unknown embed type should be unsupported
-  it('classifies an unknown embed type as unsupported', () => {
+  // invalid external embed should be unsupported
+  it('classifies an invalid external embed as unsupported', () => {
     const post = {
       embed: {
         $type: 'app.bsky.embed.external#view',
+      },
+    }
+
+    expect(classifyBlueskyPost(post)).toBe('unsupported')
+  })
+
+  // gif from a different website should be unsupported
+  it('does not accept external GIFs from other websites', () => {
+    const post = {
+      embed: {
+        $type: 'app.bsky.embed.external#view',
+        external: {
+          uri: 'https://example.com/example.gif',
+        },
+      },
+    }
+
+    expect(classifyBlueskyPost(post)).toBe('unsupported')
+  })
+
+  // invalid external uri should be unsupported
+  it('classifies an invalid external URI as unsupported', () => {
+    const post = {
+      embed: {
+        $type: 'app.bsky.embed.external#view',
+        external: {
+          uri: 'not a URL',
+        },
       },
     }
 
