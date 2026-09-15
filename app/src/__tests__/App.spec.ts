@@ -74,4 +74,33 @@ describe('App', () => {
 
     expect(wrapper.get('[role="alert"]').text()).toBe('Could not retrieve this Bluesky post')
   })
+
+  // image post should show images after being fetched
+  it('shows the detected type for an image post', async () => {
+    const apiData = {
+      posts: [
+        {
+          embed: {
+            $type: 'app.bsky.embed.images#view',
+            images: [],
+          },
+        },
+      ],
+    }
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify(apiData), {
+        status: 200,
+      }),
+    )
+
+    const wrapper = mount(App)
+
+    await wrapper.get('#post-url').setValue('https://bsky.app/profile/did:plc:abc123/post/abc123')
+
+    await wrapper.get('form').trigger('submit')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Detected post type: images')
+  })
 })

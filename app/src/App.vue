@@ -2,13 +2,16 @@
 import { ref } from 'vue'
 import { parseBlueskyPostUrl } from './utils/parseBlueskyPostUrl'
 import { fetchBlueskyPost } from './services/fetchBlueskyPost'
+import { classifyBlueskyPost, type BlueskyPostKind } from './services/classifyBlueskyPost'
 
 const postUrl = ref('')
 const validationError = ref('')
 const retrievedPost = ref<unknown | null>(null)
+const postKind = ref<BlueskyPostKind | null>(null)
 
 async function handleSubmit() {
   retrievedPost.value = null
+  postKind.value = null
   const parsedResult = parseBlueskyPostUrl(postUrl.value)
 
   if (parsedResult === null) {
@@ -18,7 +21,10 @@ async function handleSubmit() {
 
   validationError.value = ''
   try {
-    retrievedPost.value = await fetchBlueskyPost(parsedResult)
+    const post = await fetchBlueskyPost(parsedResult)
+
+    retrievedPost.value = post
+    postKind.value = classifyBlueskyPost(post)
   } catch {
     validationError.value = 'Could not retrieve this Bluesky post'
   }
@@ -46,6 +52,7 @@ async function handleSubmit() {
         />
         <button type="submit">Submit</button>
       </form>
+      <p v-if="postKind">Detected post type: {{ postKind }}</p>
       <p>Supports BlueSky posts with images, video, GIF-style media or text only.</p>
     </section>
   </main>
